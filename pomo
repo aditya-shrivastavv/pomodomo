@@ -1,0 +1,124 @@
+#!python
+import time
+from argparse import ArgumentParser
+from windows_toasts import WindowsToaster, Toast, ToastAudio
+
+
+def toaster(message, tune):
+    toaster = WindowsToaster("⏳ Pomodomo")
+    toast = Toast()
+    toast.text_fields = message
+    toast.audio = ToastAudio(tune)
+    toast.attribution_text = "Powered by Python"
+    toast.images
+    toaster.show_toast(toast)
+
+
+WORKTIME = 25
+BREAKTIME = 5
+
+parser = ArgumentParser(
+    prog="pom",
+    description="Simple Pomodoro Time with Sound Notification.! 🍅",
+    epilog="Author - Aditya Shrivastav",
+)
+parser.add_argument(
+    "-r", "--repeat", help="Repeat the cycle", action="store_true", default=False
+)
+parser.add_argument(
+    "-t",
+    "--worktime",
+    type=int,
+    default=WORKTIME,
+    help=f"Start a clock for n minutes (defualt {WORKTIME} minutes)",
+)
+parser.add_argument(
+    "-b",
+    "--breaktime",
+    type=int,
+    default=BREAKTIME,
+    help=f"Start a break for n minutes (defualt {BREAKTIME} minutes)",
+)
+raw_args = parser.parse_args()
+args = {
+    "time": int(raw_args.worktime),
+    "break": int(raw_args.breaktime),
+    "repeat": bool(raw_args.repeat),
+}
+
+
+def timer(minutes, message=""):
+    start_time = time.perf_counter()
+    while True:
+        diff_seconds = int(round(time.perf_counter() - start_time))
+        left_seconds = minutes * 60 - diff_seconds
+        if left_seconds <= 0:
+            print("")
+            break
+
+        seconds_slot = int(left_seconds % 60)
+        seconds_str = (
+            str(seconds_slot) if seconds_slot >= 10 else "0{}".format(seconds_slot)
+        )
+
+        countdown = "{}:{} ⏰".format(int(left_seconds / 60), seconds_str)
+        duration = min(minutes, 25)
+        progressbar(diff_seconds, minutes * 60, duration, countdown)
+        time.sleep(1)
+
+    print(f"\n🔔  {message}")
+
+
+def progressbar(curr, total, duration=10, extra=""):
+    frac = curr / total
+    filled = round(frac * duration)
+    print(
+        "\r",
+        "⌚" * filled + "--" * (duration - filled),
+        "[{:.0%}]".format(frac),
+        extra,
+        end="",
+    )
+
+
+def run():
+    if not args["repeat"]:
+        print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
+        timer(args["time"], "You can take a break now")
+        toaster(
+            message=[
+                "🛌 You can take a break now",
+                "Go look something that's 20 feet away",
+            ],
+            tune="Reminder",
+        )
+    else:
+        cycle = 0
+        while True:
+            print("🚴‍♂️ Cycle,", cycle)
+            print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
+            timer(args["time"], "Break time!")
+            toaster(
+                message=["🍀 Break Time...", "Go look something that's 20 feet away"],
+                tune="Reminder",
+            )
+            print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
+            timer(args["break"], "Work time!")
+            toaster(
+                message=["⚒️ Work Time...", "Work like hell, be elon musk"], tune="SMS"
+            )
+            cycle += 1
+
+
+def main():
+    try:
+        run()
+    except KeyboardInterrupt:
+        print("\n👋 goodbye")
+    except Exception as ex:
+        print(ex)
+        exit(1)
+
+
+if __name__ == "__main__":
+    main()
