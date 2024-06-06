@@ -1,17 +1,16 @@
 #!python
 import time
 from argparse import ArgumentParser
-from windows_toasts import WindowsToaster, Toast, ToastAudio, ToastDuration
+from plyer import notification
 
 
-def toaster(message, tune):
-    toaster = WindowsToaster("⏳ Pomodomo")
-    toast = Toast()
-    toast.text_fields = message
-    toast.audio = ToastAudio(tune)
-    toast.attribution_text = "Powered by Python"
-    toast.duration = ToastDuration("long")
-    toaster.show_toast(toast)
+def toaster(title, message, type):
+    notification.notify(
+        title=title,
+        message=message,
+        app_name="Pomodomo",
+        app_icon="./icons/break.ico" if type == "break" else "./icons/work.ico",
+    )
 
 
 WORKTIME = 25
@@ -86,35 +85,30 @@ def run():
         print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
         timer(args["time"], "You can take a break now")
         toaster(
-            message=[
-                "🛌 You can take a break now",
-                "Go look something that's 20 feet away",
-            ],
-            tune="Reminder",
+            title="🛌 You can take a break now",
+            message="Go look something that's 20 feet away",
+            type="break",
         )
-    else:
-        cycle = 0
-        while True:
-            print("🚴‍♂️ Cycle,", cycle)
-            print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
-            timer(args["time"], "Break time!")
-            toaster(
-                message=[
-                    f"🍀 Break Time...({args['time']} mins)",
-                    "Go look something that's 20 feet away",
-                ],
-                tune="Reminder",
-            )
-            print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
-            timer(args["break"], "Work time!")
-            toaster(
-                message=[
-                    f"⚒️ Work Time...({args['break']})",
-                    "Work like hell, be elon musk",
-                ],
-                tune="SMS",
-            )
-            cycle += 1
+        return
+
+    cycle = 0
+    while True:
+        print("🚴‍♂️ Cycle,", cycle)
+        print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
+        timer(args["time"], "Break time!")
+        toaster(
+            title=f"🌸 Break Time...({args['time']} mins)",
+            message="Go look something that's 20 feet away",
+            type="break",
+        )
+        print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
+        timer(args["break"], "Work time!")
+        toaster(
+            title=f"⚒️ Work Time...({args['break']})",
+            message="Work like hell, be elon musk",
+            type="work",
+        )
+        cycle += 1
 
 
 def main():
