@@ -1,7 +1,7 @@
 #!python
 import time
 from argparse import ArgumentParser
-from windows_toasts import WindowsToaster, Toast, ToastAudio
+from windows_toasts import WindowsToaster, Toast, ToastAudio, ToastDuration
 
 
 def toaster(message, tune):
@@ -10,7 +10,7 @@ def toaster(message, tune):
     toast.text_fields = message
     toast.audio = ToastAudio(tune)
     toast.attribution_text = "Powered by Python"
-    toast.images
+    toast.duration = ToastDuration("long")
     toaster.show_toast(toast)
 
 
@@ -99,13 +99,20 @@ def run():
             print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
             timer(args["time"], "Break time!")
             toaster(
-                message=["🍀 Break Time...", "Go look something that's 20 feet away"],
+                message=[
+                    f"🍀 Break Time...({args['time']} mins)",
+                    "Go look something that's 20 feet away",
+                ],
                 tune="Reminder",
             )
             print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
             timer(args["break"], "Work time!")
             toaster(
-                message=["⚒️ Work Time...", "Work like hell, be elon musk"], tune="SMS"
+                message=[
+                    f"⚒️ Work Time...({args['break']})",
+                    "Work like hell, be elon musk",
+                ],
+                tune="SMS",
             )
             cycle += 1
 
