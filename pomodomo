@@ -1,5 +1,7 @@
 #!python
 import time
+import winsound
+import threading
 from argparse import ArgumentParser
 from plyer import notification
 from os import path
@@ -30,6 +32,9 @@ parser.add_argument(
     "-r", "--repeat", help="Repeat the cycle", action="store_true", default=False
 )
 parser.add_argument(
+    "-s", "--sound", help="Play sound", action="store_true", default=False
+)
+parser.add_argument(
     "-t",
     "--worktime",
     type=int,
@@ -48,17 +53,36 @@ args = {
     "time": int(raw_args.worktime),
     "break": int(raw_args.breaktime),
     "repeat": bool(raw_args.repeat),
+    "sound": bool(raw_args.sound),
 }
 
 
-def timer(minutes, message=""):
+def sound_player(kind):
+    if kind == "w":
+        winsound.PlaySound("./assets/work-over.wav", winsound.SND_FILENAME)
+    elif kind == "b":
+        winsound.PlaySound("./assets/break-over.wav", winsound.SND_FILENAME)
+    else:
+        # Play default sound
+        winsound.PlaySound("", winsound.SND_FILENAME)
+
+
+def timer(minutes, message="", kind=""):
     start_time = time.perf_counter()
+    sound_played = False
     while True:
         diff_seconds = int(round(time.perf_counter() - start_time))
         left_seconds = minutes * 60 - diff_seconds
         if left_seconds <= 0:
             print("")
             break
+
+        # Sound
+        if args["sound"] and left_seconds <= 5 and not sound_played:
+            sound_played = True
+            # Start playing in background
+            sound_thread = threading.Thread(target=sound_player, args=kind)
+            sound_thread.start()
 
         seconds_slot = int(left_seconds % 60)
         seconds_str = (
@@ -88,7 +112,7 @@ def progressbar(curr, total, duration=10, extra=""):
 def run():
     if not args["repeat"]:
         print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
-        timer(args["time"], "You can take a break now")
+        timer(args["time"], "You can take a break now", "w")
         toaster(
             title="🛌 You can take a break now",
             message="Go look something that's 20 feet away",
@@ -100,14 +124,14 @@ def run():
     while True:
         print("🚴‍♂️ Cycle,", cycle)
         print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
-        timer(args["time"], "Break time!")
+        timer(args["time"], "Break time!", "w")
         toaster(
             title=f"🌸 Break Time...({args['time']} mins)",
             message="Go look something that's 20 feet away",
             type="break",
         )
         print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
-        timer(args["break"], "Work time!")
+        timer(args["break"], "Work time!", "b")
         toaster(
             title=f"⚒️ Work Time...({args['break']})",
             message="Work like hell, be elon musk",
