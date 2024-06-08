@@ -39,14 +39,14 @@ parser.add_argument(
     "--worktime",
     type=int,
     default=WORKTIME,
-    help=f"Start a clock for n minutes (defualt {WORKTIME} minutes)",
+    help=f"Start a clock for n minutes (default {WORKTIME} minutes)",
 )
 parser.add_argument(
     "-b",
     "--breaktime",
     type=int,
     default=BREAKTIME,
-    help=f"Start a break for n minutes (defualt {BREAKTIME} minutes)",
+    help=f"Start a break for n minutes (default {BREAKTIME} minutes)",
 )
 raw_args = parser.parse_args()
 args = {
