@@ -25,7 +25,7 @@ BREAKTIME = 5
 
 parser = ArgumentParser(
     prog="pomodomo",
-    description="Simple Pomodoro Time with Notification.! 🍅",
+    description="Simple Pomodoro Timer with Windows and Sound Notification.! ⌛",
     epilog="Author - Aditya Shrivastav",
 )
 parser.add_argument(
