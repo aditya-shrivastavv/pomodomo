@@ -2,6 +2,7 @@
 import time
 from argparse import ArgumentParser
 from plyer import notification
+from os import path
 
 
 def toaster(title, message, type):
@@ -9,7 +10,11 @@ def toaster(title, message, type):
         title=title,
         message=message,
         app_name="Pomodomo",
-        app_icon="./icons/break.ico" if type == "break" else "./icons/work.ico",
+        app_icon=(
+            path.abspath("./icons/break.ico")
+            if type == "break"
+            else path.abspath("./icons/work.ico")
+        ),
     )
 
 
