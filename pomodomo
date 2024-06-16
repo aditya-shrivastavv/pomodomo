@@ -126,14 +126,14 @@ def run():
         print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
         timer(args["time"], "Break time!", "w")
         toaster(
-            title=f"🌸 Break Time...({args['time']} mins)",
+            title=f"🌸 Break Time...({args['break']} mins)",
             message="Go look something that's 20 feet away",
             type="break",
         )
         print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
         timer(args["break"], "Work time!", "b")
         toaster(
-            title=f"⚒️ Work Time...({args['break']})",
+            title=f"⚒️ Work Time...({args['time']})",
             message="Work like hell, be elon musk",
             type="work",
         )
