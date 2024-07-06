@@ -7,19 +7,6 @@ from plyer import notification
 from os import path
 
 
-def toaster(title, message, type):
-    notification.notify(
-        title=title,
-        message=message,
-        app_name="Pomodomo",
-        app_icon=(
-            path.abspath("./icons/break.ico")
-            if type == "break"
-            else path.abspath("./icons/work.ico")
-        ),
-    )
-
-
 WORKTIME = 25
 BREAKTIME = 5
 
@@ -48,13 +35,33 @@ parser.add_argument(
     default=BREAKTIME,
     help=f"Start a break for n minutes (default {BREAKTIME} minutes)",
 )
+parser.add_argument(
+    "--takebreak",
+    help=f"Take a break for n minutes (default {BREAKTIME} minutes)",
+    action="store_true",
+    default=False
+)
 raw_args = parser.parse_args()
 args = {
     "time": int(raw_args.worktime),
     "break": int(raw_args.breaktime),
+    "takebreak": bool(raw_args.takebreak),
     "repeat": bool(raw_args.repeat),
     "sound": bool(raw_args.sound),
 }
+
+
+def toaster(title, message, type):
+    notification.notify(
+        title=title,
+        message=message,
+        app_name="Pomodomo",
+        app_icon=(
+            path.abspath("./icons/break.ico")
+            if type == "break"
+            else path.abspath("./icons/work.ico")
+        ),
+    )
 
 
 def sound_player(kind):
@@ -110,6 +117,18 @@ def progressbar(curr, total, duration=10, extra=""):
 
 
 def run():
+    if args["takebreak"]:
+        if args["repeat"]:
+            print("🚨 Repeat mode cannot be used with option `--takebreak`.")
+            exit(1)
+        print(f'🛀  break {args["break"]} minutes. Ctrl+C to exit')
+        timer(args["break"], "Break time over dude!", "w")
+        toaster(
+            title="🙃 Break time over bro...",
+            message="Thanks for taking a break!",
+            type="work",
+        )
+        exit(0)
     if not args["repeat"]:
         print(f'⏲️  timer {args["time"]} minutes. Ctrl+C to exit')
         timer(args["time"], "You can take a break now", "w")
